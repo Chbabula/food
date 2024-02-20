@@ -43,9 +43,12 @@ class CalculateDeliveryCost(APIView):
             zone = serializer.validated_data['zone']
         
             total_price = self.calculate_price(zone, organization_id, total_distance, item_id)
-            return Response({'total_price': total_price}, status=status.HTTP_200_OK)
+            if total_price is not None:
+                return Response({'total_price': total_price}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Pricing not found for the given parameters"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"error": "Bad Request"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def calculate_price(self, zone, organization_id, total_distance, item_id):
         base_price = Decimal(0)
@@ -61,7 +64,8 @@ class CalculateDeliveryCost(APIView):
         if total_distance <= pricing.base_distance_in_km:
             total_price = base_price
         else:
-            extra_distance = Decimal(total_distance - pricing.base_distance_in_km)
-            total_price = base_price + (extra_distance * per_km_price)
+            total_price= (pricing.base_distance_in_km*pricing.km_price)+per_km_price
+            # extra_distance = Decimal(total_distance - pricing.base_distance_in_km)
+            # total_price = base_price + (extra_distance * per_km_price)
         
-        return total_price
+        return ("Total price:", total_price)
