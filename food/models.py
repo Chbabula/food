@@ -19,5 +19,3 @@ class Pricing(models.Model):
     base_distance_in_km = models.PositiveIntegerField()
     km_price = models.DecimalField(max_digits=5, decimal_places=2)
     fix_price = models.DecimalField(max_digits=7, decimal_places=2)
-
-item, creditd = Item.objects.get_or_create(pk=2, defaults={'type': 'perishable', 'descripiton':'Descripiton of the item'})
